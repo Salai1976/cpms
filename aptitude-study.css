@@ -1,0 +1,19 @@
+/* Scoped aptitude styles: does not modify existing CampusHire components */
+#aptitude .ch-study-intro{color:#64748b;margin:12px 0 20px;line-height:1.6}
+#aptitude .ch-study-filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+#aptitude .ch-study-filter{border:1px solid #cbd5e1;border-radius:20px;padding:9px 14px;background:#fff;color:#334155;cursor:pointer}
+#aptitude .ch-study-filter.selected{background:#2563eb;border-color:#2563eb;color:white}
+#aptitude .ch-study-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+#aptitude .ch-study-topic{border:1px solid #dbe3f0;border-radius:11px;overflow:hidden;background:#fff}
+#aptitude .ch-study-topic summary{cursor:pointer;padding:17px;display:flex;justify-content:space-between;gap:12px;font-weight:700;list-style:none}
+#aptitude .ch-study-topic summary::-webkit-details-marker{display:none}
+#aptitude .ch-study-topic-body{padding:0 17px 16px;line-height:1.6;font-size:14px}
+#aptitude .ch-study-topic-body p{margin-top:11px}
+#aptitude .ch-study-chevron{color:#2563eb}
+#aptitude .ch-study-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#aptitude .ch-study-link{border:1px solid #dbe3f0;border-radius:10px;padding:16px;color:#1d4ed8;text-decoration:none;display:flex;flex-direction:column;gap:7px}
+#aptitude .ch-study-link:hover{background:#eff6ff}
+#aptitude .ch-study-link small{color:#64748b}
+body.dark #aptitude .ch-study-topic,body.dark #aptitude .ch-study-filter,body.dark #aptitude .ch-study-link{background:#1e293b;border-color:#475569;color:#e2e8f0}
+body.dark #aptitude .ch-study-filter.selected{background:#2563eb;color:white}
+@media(max-width:700px){#aptitude .ch-study-grid,#aptitude .ch-study-links{grid-template-columns:1fr}}

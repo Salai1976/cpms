@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusHire - Placement Management System</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="aptitude.css">
+<link rel="stylesheet" href="aptitude-study.css">
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="loginPage">
+<div class="login-container">
+<div class="login-icon">🎓</div>
+<div class="login-logo">Campus<span>Hire</span></div>
+<p class="login-subtitle">Placement Management System</p>
+
+<div id="loginError" class="login-error">❌ Invalid credentials. Please try again.</div>
+
+<div class="login-group">
+<label>Select Role</label>
+<select id="loginRole">
+<option value="student">👨‍🎓 Student</option>
+<option value="admin">🛡️ TPO / Admin</option>
+</select>
+</div>
+
+<div class="login-group">
+<label>Email / Username</label>
+<input type="text" id="loginEmail" placeholder="Enter email">
+</div>
+
+<div class="login-group">
+<label>Password</label>
+<div class="password-wrapper">
+<input type="password" id="loginPassword" placeholder="Enter password">
+<button type="button" class="password-toggle" id="loginPasswordToggle" onclick="togglePasswordVisibility('loginPassword', this)" aria-label="Show password">👁️</button>
+</div>
+</div>
+
+<button class="login-btn" onclick="login()">Login</button>
+
+<div class="auth-links">
+New student? <a onclick="openSignup()">Register here</a>
+<br>
+<a onclick="openForgotPassword()">Forgot password?</a>
+</div>
+
+<div class="login-note">
+TPO/Admin accounts are provisioned by the placement cell and are not self-registered here.
+</div>
+
+</div>
+</div>
+
+<!-- ===================== FORGOT PASSWORD ===================== -->
+<div class="modal" id="forgotPasswordModal">
+<div class="modal-box">
+<h2 class="modal-title">🔐 Reset Password</h2>
+<p class="modal-subtitle" id="forgotPasswordMessage">Enter your registered student email to receive an OTP.</p>
+
+<div class="input-group full">
+<label>Registered Email</label>
+<input id="forgotEmail" type="email" placeholder="you@example.com">
+</div>
+
+<div class="input-group full" id="forgotOtpGroup" style="display:none">
+<label>OTP</label>
+<input id="forgotOtp" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit OTP">
+</div>
+
+<div class="input-group full" id="forgotNewPasswordGroup" style="display:none">
+<label>New Password</label>
+<input id="forgotNewPassword" type="password" placeholder="Create a new password">
+</div>
+
+<div class="input-group full" id="forgotConfirmPasswordGroup" style="display:none">
+<label>Confirm New Password</label>
+<input id="forgotConfirmPassword" type="password" placeholder="Re-enter your new password">
+</div>
+
+<div class="modal-buttons">
+<button class="btn secondary" onclick="closeForgotPassword()">Cancel</button>
+<button class="btn primary" id="sendOtpButton" onclick="sendPasswordOtp()">Send OTP</button>
+<button class="btn primary" id="resetPasswordButton" onclick="resetForgottenPassword()" style="display:none">Reset Password</button>
+</div>
+</div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="hidden">
+
+<div class="sidebar">
+<div class="logo">Campus<span>Hire</span></div>
+<div class="role-label" id="roleLabel">STUDENT PORTAL</div>
+
+<ul class="menu" id="menu">
+
+<div id="studentMenu">
+<li><button class="active" onclick="showPage('dashboard',this)">🏠 Dashboard</button></li>
+<li><button onclick="showPage('eligibleForMe',this)">🎯 Eligible For Me</button></li>
+<li><button onclick="showPage('drives',this)">💼 All Drives</button></li>
+<li><button onclick="showPage('applications',this)">📄 My Applications</button></li>
+<li><button onclick="showPage('profile',this)">👨‍🎓 My Profile</button></li>
+<li><button onclick="showPage('aptitude',this)">🧠 Aptitude Preparation</button></li>
+<li><button onclick="showPage('notifications',this)">🔔 Notifications</button></li>
+<li><button onclick="showPage('calendar',this)">📅 Calendar</button></li>
+</div>
+
+<div id="adminMenu" class="hidden">
+<li><button class="active" onclick="showPage('adminDashboard',this)">🏠 Dashboard</button></li>
+<li><button onclick="showPage('admin',this)">🏢 Companies</button></li>
+<li><button onclick="showPage('driveManage',this)">📋 Placement Drives</button></li>
+<li><button onclick="showPage('companyApplications',this)">📄 Applications</button></li>
+<li><button onclick="showPage('studentManage',this)">👨‍🎓 Students</button></li>
+<li><button onclick="showPage('notifManage',this)">🔔 Notifications</button></li>
+<li><button onclick="showPage('calendar',this)">📅 Calendar</button></li>
+<li><button onclick="showPage('reports',this)">📊 Reports</button></li>
+</div>
+
+</ul>
+
+<button class="logout-btn" onclick="logout()">🚪 Logout</button>
+</div>
+
+<div class="main">
+
+<div class="topbar">
+<input class="search" id="searchBox" placeholder="Search..." onkeyup="searchDrives()">
+<div class="profile">
+<button class="btn secondary" onclick="toggleDark()">🌙</button>
+<div>
+<b id="topUserName">User</b>
+<small id="topUserRole" style="display:block;color:#64748b">Student</small>
+</div>
+<div class="avatar" id="topAvatar">U</div>
+</div>
+</div>
+
+<div class="content">
+
+<!-- ============ STUDENT DASHBOARD ============ -->
+<section id="dashboard" class="page active">
+<h1 class="page-title" id="dashboardGreeting">Good Evening 👋</h1>
+<p class="subtitle">Welcome to CampusHire Placement Management System</p>
+<div id="studentBanner" class="banner success hidden"></div>
+
+<div class="stats">
+<div class="stat-card"><div class="stat-top"><span>Eligible Drives</span><div class="stat-icon">💼</div></div><div class="stat-number" id="eligibleCount">0</div><div class="stat-label">Based on your profile</div></div>
+<div class="stat-card"><div class="stat-top"><span>Applications</span><div class="stat-icon">📄</div></div><div class="stat-number" id="applicationCount">0</div><div class="stat-label">Drives applied</div></div>
+<div class="stat-card"><div class="stat-top"><span>Shortlisted</span><div class="stat-icon">⭐</div></div><div class="stat-number" id="studentShortlistedCount">0</div><div class="stat-label">Currently shortlisted</div></div>
+<div class="stat-card"><div class="stat-top"><span>Selected</span><div class="stat-icon">🏆</div></div><div class="stat-number" id="studentSelectedCount">0</div><div class="stat-label">Selected / Placed</div></div>
+</div>
+
+<div class="section">
+<div class="section-header"><div class="section-title">Recommended / Eligible Drives</div><button class="btn primary" onclick="showPage('eligibleForMe')">View All</button></div>
+<div class="job-grid" id="recommendedDrivesGrid"></div>
+</div>
+</section>
+
+<!-- ============ ELIGIBLE FOR ME ============ -->
+<section id="eligibleForMe" class="page">
+<h1 class="page-title">Eligible For Me</h1>
+<p class="subtitle">Placement drives you currently satisfy the eligibility criteria for.</p>
+<div class="section">
+<div class="job-grid" id="eligibleForMeGrid"></div>
+</div>
+</section>
+
+<!-- ============ ALL DRIVES ============ -->
+<section id="drives" class="page">
+<h1 class="page-title">All Placement Drives</h1>
+<p class="subtitle">Every drive is automatically evaluated against your profile.</p>
+<div class="section">
+<div class="section-header">
+<div class="section-title">Drives</div>
+<select id="driveFilter" onchange="renderStudentViews()" style="padding:9px;border:1px solid #ddd;border-radius:7px">
+<option value="all">All Drives</option>
+<option value="eligible">Eligible Only</option>
+<option value="open">Registration Open</option>
+</select>
+</div>
+<div class="job-grid" id="driveContainer"></div>
+</div>
+</section>
+
+<!-- ============ MY PROFILE ============ -->
+<section id="profile" class="page">
+<h1 class="page-title">Student Profile</h1>
+<p class="subtitle">Information used for automatic eligibility verification.</p>
+<div class="profile-grid">
+<div class="profile-card">
+<div class="big-avatar" id="studentAvatarBig">SN</div>
+<h2 id="profileHeaderName">Student</h2>
+<p style="color:#64748b" id="profileHeaderDept">Department</p>
+<br>
+<button class="btn primary" onclick="openEditProfile()">Edit Profile</button>
+</div>
+<div class="profile-card">
+<h3>Eligibility Information</h3>
+<div class="detail"><label>Full Name</label><span id="profFullName">-</span></div>
+<div class="detail"><label>Register Number</label><span id="profRegNo">-</span></div>
+<div class="detail"><label>CGPA</label><strong id="profCgpa">-</strong></div>
+<div class="detail"><label>Batch / Graduation Year</label><strong id="profGradYear">-</strong></div>
+<div class="detail"><label>Active Backlogs</label><strong id="profBacklogs">-</strong></div>
+<div class="detail"><label>10th %</label><span id="profTenth">-</span></div>
+<div class="detail"><label>12th %</label><span id="profTwelfth">-</span></div>
+<div class="detail"><label>Skills</label><span id="profSkills">-</span></div>
+<div class="detail"><label>Phone</label><span id="profPhone">-</span></div>
+</div>
+</div>
+<br>
+<div class="section">
+<div class="section-header"><div class="section-title">Resume</div><button class="btn primary" onclick="document.getElementById('resume').click()">Upload Resume</button></div>
+<input type="file" id="resume" style="display:none" accept=".pdf,.doc,.docx" onchange="resumeUploaded(event)">
+<div id="resumeStatus" style="padding:18px;background:#f8fafc;border-radius:8px">No resume uploaded yet.</div>
+</div>
+</section>
+
+<!-- ============ STUDENT BONUS: APTITUDE PREPARATION ============ -->
+<section id="aptitude" class="page">
+<h1 class="page-title">🧠 Aptitude Preparation</h1>
+<p class="subtitle">Practice placement aptitude by topic. This module does not affect placement eligibility or applications.</p>
+<div class="section">
+  <div class="section-header"><div class="section-title">Choose Your Practice</div><span class="apt-chip">Student bonus feature</span></div>
+  <div class="apt-controls">
+    <label>Category<select id="aptCategory"><option value="all">All Categories</option><option value="quant">Quantitative Aptitude</option><option value="logical">Logical Reasoning</option><option value="verbal">Verbal Ability</option></select></label>
+    <label>Difficulty<select id="aptDifficulty"><option value="all">All Levels</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label>
+    <label>Mode<select id="aptMode"><option value="practice">Practice (explanations after each answer)</option><option value="mock">Mock Test (results at end)</option></select></label>
+    <label>Questions<select id="aptCount"><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></label>
+  </div>
+  <button class="btn primary" id="aptStart">Start Preparation</button>
+  <p id="aptNotice" class="apt-notice" aria-live="polite"></p>
+</div>
+<div class="section" id="aptQuiz" hidden>
+  <div class="apt-quiz-head"><strong id="aptProgress"></strong><span id="aptTimer"></span></div>
+  <div class="apt-progress-track"><div id="aptProgressBar"></div></div>
+  <p class="apt-question" id="aptQuestion"></p>
+  <div id="aptOptions" class="apt-options"></div>
+  <div id="aptFeedback" class="apt-feedback" aria-live="polite" hidden></div>
+  <div class="apt-actions"><button class="btn secondary" id="aptQuit">Exit</button><button class="btn primary" id="aptNext" disabled>Check Answer</button></div>
+</div>
+<div class="section" id="aptResults" hidden>
+  <h2 class="section-title">Your Results</h2>
+  <p class="apt-result-score" id="aptScore"></p>
+  <div class="apt-result-grid" id="aptResultGrid"></div>
+  <div class="apt-result-message" id="aptResultMessage"></div>
+  <div class="apt-result-message" id="aptRecommendations"></div>
+  <div id="aptReview"></div>
+  <button class="btn primary" id="aptRetry">Practice Again</button>
+</div>
+  <div class="section apt-history-section">
+    <div class="section-header"><div class="section-title">📈 My Previous Test Results</div><button class="btn secondary small" id="aptClearHistory" type="button">Clear My History</button></div>
+    <p class="apt-notice">Saved only in this browser for your student account. Not part of official placement records.</p>
+    <div id="aptHistory"></div>
+  </div>
+  <div class="section"><div class="section-title">📚 Learn Aptitude Topics &amp; Formulas</div><p class="ch-study-intro">Explore explanations, solved examples, and preparation tips after your practice tests.</p><div class="ch-study-filters" id="ch-study-filters"></div><div class="ch-study-grid" id="ch-study-topics"></div></div>
+  <div class="section"><div class="section-title">🌐 External Practice Resources</div><p class="ch-study-intro">Continue preparing on these independent websites. Links open in a new tab.</p><div class="ch-study-links" id="ch-study-links"></div></div>
+</section>
+
+<!-- ============ MY APPLICATIONS ============ -->
+<section id="applications" class="page">
+<h1 class="page-title">My Applications</h1>
+<p class="subtitle">Track your placement applications. Status is updated by the placement cell only.</p>
+<div class="section">
+<table>
+<thead><tr><th>Company</th><th>Role</th><th>Applied On</th><th>Status</th><th>History</th></tr></thead>
+<tbody id="applicationTable"><tr><td colspan="5" style="text-align:center;color:#64748b">No applications yet.</td></tr></tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ NOTIFICATIONS (student) ============ -->
+<section id="notifications" class="page">
+<h1 class="page-title">Notifications</h1>
+<p class="subtitle">Updates from the placement cell.</p>
+<div class="section" id="studentNotifList"></div>
+</section>
+
+<!-- ============ CALENDAR (shared) ============ -->
+<section id="calendar" class="page">
+<h1 class="page-title">Placement Calendar</h1>
+<p class="subtitle">Registration windows, drive dates and rounds at a glance.</p>
+<div class="section" id="calendarList"></div>
+</section>
+
+<!-- ============ ADMIN DASHBOARD ============ -->
+<section id="adminDashboard" class="page">
+<h1 class="page-title">TPO / Admin Dashboard</h1>
+<p class="subtitle">Centralized placement management.</p>
+<div class="stats">
+<div class="stat-card"><div class="stat-number" id="adminTotalStudents">0</div><div class="stat-label">Total Students</div></div>
+<div class="stat-card"><div class="stat-number" id="adminFinalYear">0</div><div class="stat-label">Final-Year Students</div></div>
+<div class="stat-card"><div class="stat-number" id="adminCompaniesCount">0</div><div class="stat-label">Registered Companies</div></div>
+<div class="stat-card"><div class="stat-number" id="adminActiveDrives">0</div><div class="stat-label">Active Drives</div></div>
+</div>
+<div class="stats">
+<div class="stat-card"><div class="stat-number" id="adminApplicationsCount">0</div><div class="stat-label">Applications</div></div>
+<div class="stat-card"><div class="stat-number" id="adminShortlistedCount">0</div><div class="stat-label">Shortlisted</div></div>
+<div class="stat-card"><div class="stat-number" id="adminSelectedCount">0</div><div class="stat-label">Selected</div></div>
+<div class="stat-card"><div class="stat-number" id="adminPlacedCount">0</div><div class="stat-label">Placed</div></div>
+</div>
+<div class="section">
+<div class="section-title">Recruitment Process</div><br>
+<p>1️⃣ TPO adds company &amp; creates a placement drive with eligibility criteria</p><br>
+<p>2️⃣ System automatically evaluates eligible students</p><br>
+<p>3️⃣ Students apply within the registration window</p><br>
+<p>4️⃣ TPO reviews applicants, shortlists, advances rounds</p><br>
+<p>5️⃣ Selection → Offer → Joining → Placed, recorded and reported</p>
+</div>
+</section>
+
+<!-- ============ ADMIN: COMPANIES ============ -->
+<section id="admin" class="page">
+<h1 class="page-title">Company Management</h1>
+<p class="subtitle">Companies added by the placement cell. Company login is not required for the main workflow.</p>
+<div class="section">
+<div class="section-header"><div class="section-title">Add Company</div></div>
+<div class="form-grid">
+<div class="input-group"><label>Company Name</label><input id="compName" placeholder="TCS"></div>
+<div class="input-group"><label>Industry</label><input id="compIndustry" placeholder="IT Services"></div>
+<div class="input-group"><label>HR / Recruiter Name</label><input id="compHr" placeholder="HR Team"></div>
+<div class="input-group"><label>Contact Phone</label><input id="compPhone" placeholder="Contact number"></div>
+<div class="input-group full"><label>Website (optional)</label><input id="compWebsite" placeholder="https://company.com"></div>
+</div>
+<br>
+<button class="btn primary" onclick="addCompany()">Add Company</button>
+</div>
+
+<div class="section">
+<div class="section-title">Registered Companies</div><br>
+<table>
+<thead><tr><th>Company</th><th>Industry</th><th>Active Drives</th><th>Applications</th><th>Shortlisted</th><th>Selected</th></tr></thead>
+<tbody id="adminCompanyTable"></tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ ADMIN: PLACEMENT DRIVES ============ -->
+<section id="driveManage" class="page">
+<h1 class="page-title">Placement Drives</h1>
+<p class="subtitle">Create a drive and define eligibility criteria. Eligibility is evaluated automatically for every student.</p>
+
+<div class="section">
+<div class="section-title">Create Placement Drive</div><br>
+<div class="form-grid">
+<div class="input-group"><label>Company</label>
+<select id="driveCompany"></select>
+</div>
+<div class="input-group"><label>Role / Title</label><input id="driveTitle" placeholder="Graduate Software Engineer"></div>
+<div class="input-group"><label>Package</label><input id="drivePackage" placeholder="₹7 LPA"></div>
+<div class="input-group"><label>Location</label><input id="driveLocation" placeholder="Chennai"></div>
+<div class="input-group"><label>Drive Date</label><input type="date" id="driveDate"></div>
+<div class="input-group"><label>Registration Start</label><input type="date" id="driveRegStart"></div>
+<div class="input-group"><label>Registration Deadline</label><input type="date" id="driveRegEnd"></div>
+<div class="input-group"><label>Eligible Departments (comma separated, blank = all)</label><input id="driveDepts" placeholder="CSE, IT"></div>
+<div class="input-group"><label>Eligible Batch / Graduation Year</label><input type="number" id="driveBatch" value="2027"></div>
+<div class="input-group"><label>Minimum CGPA</label><input type="number" step="0.1" id="driveMinCgpa" value="8.0"></div>
+<div class="input-group"><label>Maximum Active Backlogs</label><input type="number" id="driveMaxBacklogs" value="0"></div>
+<div class="input-group"><label>10th Minimum %</label><input type="number" id="driveMin10" value="60"></div>
+<div class="input-group"><label>12th Minimum %</label><input type="number" id="driveMin12" value="60"></div>
+<div class="input-group full"><label>Required Skills (comma separated)</label><input id="driveSkills" placeholder="Java, SQL"></div>
+<div class="input-group full"><label>Selection Rounds (comma separated)</label><input id="driveRounds" placeholder="Aptitude, Technical Interview, HR Interview"></div>
+<div class="input-group full"><label>Description</label><textarea id="driveDescription" placeholder="Role description..."></textarea></div>
+<div class="input-group full">
+    <label>External Registration Link (Optional)</label>
+    <input
+        type="url"
+        id="driveRegistrationLink"
+        placeholder="https://forms.gle/..."
+    >
+    <small class="field-note">
+        Paste the company registration link, if provided.
+        Leave blank if not required.
+    </small>
+</div>
+</div>
+<br>
+<button class="btn primary" onclick="createDrive()">Create Drive</button>
+</div>
+
+<div class="section">
+<div class="section-title">All Drives</div><br>
+<table>
+<thead><tr><th>Company</th><th>Role</th><th>Batch</th><th>Registration Window</th><th>Status</th><th>Eligible</th><th>Applied</th><th></th></tr></thead>
+<tbody id="adminDriveTable"></tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ ADMIN: APPLICATIONS ============ -->
+<section id="companyApplications" class="page">
+<h1 class="page-title">Applications</h1>
+<p class="subtitle">Select a drive to review its applicants.</p>
+
+<div class="section">
+<div class="input-group" style="max-width:500px">
+<label>Select Placement Drive</label>
+<select id="appsDriveSelect" onchange="renderApplicationsForDrive()"></select>
+</div>
+</div>
+
+<div id="appsDriveDetail"></div>
+</section>
+
+<!-- ============ ADMIN: STUDENTS ============ -->
+<section id="studentManage" class="page">
+<h1 class="page-title">Students</h1>
+<p class="subtitle">Search and manage the student directory.</p>
+
+<div class="section">
+<div class="form-grid">
+<div class="input-group"><label>Search (Name or Register No)</label><input id="stuSearchText" onkeyup="renderStudentManageTable()" placeholder="e.g. Narmatha or 23CSE027"></div>
+<div class="input-group"><label>Department</label><select id="stuFilterDept" onchange="renderStudentManageTable()"><option value="all">All</option></select></div>
+<div class="input-group"><label>Batch</label><select id="stuFilterBatch" onchange="renderStudentManageTable()"><option value="all">All</option></select></div>
+<div class="input-group"><label>Min CGPA</label><input type="number" step="0.1" id="stuFilterCgpa" value="0" onkeyup="renderStudentManageTable()"></div>
+</div>
+</div>
+
+<div class="section">
+<table>
+<thead><tr><th>Register No</th><th>Name</th><th>Department</th><th>Batch</th><th>CGPA</th><th>Backlogs</th><th>Placement Status</th><th></th></tr></thead>
+<tbody id="studentManageTable"></tbody>
+</table>
+</div>
+
+<div class="section hidden" id="studentDetailBox"></div>
+</section>
+
+<!-- ============ ADMIN: NOTIFICATIONS ============ -->
+<section id="notifManage" class="page">
+<h1 class="page-title">Notifications</h1>
+<p class="subtitle">Send updates to students.</p>
+<div class="section">
+<div class="form-grid">
+<div class="input-group"><label>Audience</label>
+<select id="notifAudience" onchange="toggleNotifDriveField()">
+<option value="all">All Students</option>
+<option value="department">Specific Department</option>
+<option value="eligible">Eligible Students for a Drive</option>
+<option value="applicants">Applicants of a Drive</option>
+<option value="shortlisted">Shortlisted for a Drive</option>
+<option value="selected">Selected for a Drive</option>
+</select>
+</div>
+<div class="input-group" id="notifDeptField">
+<label>Department</label>
+<input id="notifDept" placeholder="CSE">
+</div>
+<div class="input-group hidden" id="notifDriveField">
+<label>Drive</label>
+<select id="notifDriveSelect"></select>
+</div>
+<div class="input-group full"><label>Message</label><textarea id="notifMessage" placeholder="e.g. Registration opened for TCS Graduate Software Engineer."></textarea></div>
+</div>
+<br>
+<button class="btn primary" onclick="sendNotification()">Send Notification</button>
+</div>
+<div class="section">
+<div class="section-title">Sent Notifications</div><br>
+<div id="adminNotifList"></div>
+</div>
+</section>
+
+<!-- ============ REPORTS ============ -->
+<section id="reports" class="page">
+<h1 class="page-title">Placement Reports</h1>
+<p class="subtitle">Overview of placement performance. Placement percentage is based on Selected/Placed records, not shortlists.</p>
+
+<div class="report-grid">
+<div class="report-card"><div class="report-number" id="repTotal">0</div><p>Total Students</p></div>
+<div class="report-card"><div class="report-number" id="repEligible">0</div><p>Eligible (any drive)</p></div>
+<div class="report-card"><div class="report-number" id="repApplied">0</div><p>Applied (any drive)</p></div>
+<div class="report-card"><div class="report-number" id="repPlacedPct">0%</div><p>Placement %</p></div>
+</div>
+<br>
+
+<div class="section">
+<div class="section-header"><div class="section-title">Department-wise Placement</div>
+<button class="btn secondary" onclick="exportCSV('dept')">Export CSV</button></div>
+<table>
+<thead><tr><th>Department</th><th>Students</th><th>Eligible</th><th>Applications</th><th>Shortlisted</th><th>Selected</th><th>Placed</th></tr></thead>
+<tbody id="deptTable"></tbody>
+</table>
+</div>
+
+<div class="section">
+<div class="section-header"><div class="section-title">Company-wise Statistics</div>
+<button class="btn secondary" onclick="exportCSV('company')">Export CSV</button></div>
+<table>
+<thead><tr><th>Company</th><th>Drives</th><th>Applications</th><th>Shortlisted</th><th>Selected</th><th>Placed</th></tr></thead>
+<tbody id="companyStatsTable"></tbody>
+</table>
+</div>
+
+<div class="section">
+<div class="section-header"><div class="section-title">Export Full Data</div></div>
+<button class="btn secondary" onclick="exportCSV('students')">Export Students CSV</button>
+&nbsp;
+<button class="btn secondary" onclick="exportCSV('applications')">Export Applications CSV</button>
+&nbsp;
+<button class="btn secondary" onclick="exportCSV('placements')">Export Placements CSV</button>
+</div>
+</section>
+
+</div>
+</div>
+</div>
+
+<!-- ===================== ELIGIBILITY / APPLY MODAL ===================== -->
+<div class="modal" id="eligibilityModal">
+<div class="modal-box">
+<h2 class="modal-title">🔍 Eligibility Verification</h2>
+<p class="modal-subtitle" id="checkingCompany">Checking eligibility...</p>
+
+<div class="eligibility-box">
+<div class="eligibility-row eligibility-header"><div>Requirement</div><div>Your Profile</div><div>Result</div></div>
+<div class="eligibility-row"><div>Department</div><div id="deptStudent">-</div><div id="deptResult">-</div></div>
+<div class="eligibility-row"><div>Batch / Graduation Year</div><div id="yearStudent">-</div><div id="yearResult">-</div></div>
+<div class="eligibility-row"><div>Minimum CGPA</div><div id="cgpaStudent">-</div><div id="cgpaResult">-</div></div>
+<div class="eligibility-row"><div>Active Backlogs</div><div id="backlogStudent">-</div><div id="backlogResult">-</div></div>
+<div class="eligibility-row"><div>10th %</div><div id="tenthStudent">-</div><div id="tenthResult">-</div></div>
+<div class="eligibility-row"><div>12th %</div><div id="twelfthStudent">-</div><div id="twelfthResult">-</div></div>
+<div class="eligibility-row"><div>Required Skills</div><div id="skillStudent">-</div><div id="skillResult">-</div></div>
+</div>
+
+<div id="eligibilityResult" class="result-box"></div>
+
+<div class="modal-buttons">
+<button class="btn secondary" onclick="closeEligibility()">Close</button>
+<button class="btn primary" id="submitApplicationButton" onclick="submitApplication()" style="display:none">Submit Application</button>
+</div>
+</div>
+</div>
+
+<!-- ===================== DRIVE DETAIL MODAL (student) ===================== -->
+<div class="modal" id="driveDetailModal">
+<div class="modal-box">
+<h2 class="modal-title" id="ddTitle">Drive Details</h2>
+<div id="ddBody"></div>
+<div class="modal-buttons">
+<button class="btn secondary" onclick="closeDriveDetail()">Close</button>
+</div>
+</div>
+</div>
+
+<!-- ===================== STUDENT SIGNUP / EDIT PROFILE MODAL ===================== -->
+<div class="modal" id="studentSignupModal">
+<div class="modal-box">
+<h2 class="modal-title" id="suModalTitle">🎓 Student Registration</h2>
+<p class="modal-subtitle">This information is used to check drive eligibility automatically.</p>
+
+<div class="form-grid">
+<div class="input-group full"><label>Full Name</label><input id="suName" placeholder="Your full name"></div>
+<div class="input-group"><label>Email (this becomes your username)</label><input id="suEmail" type="email" placeholder="you@example.com"></div>
+<div class="input-group"><label>Register Number</label><input id="suRegNo" placeholder="23CSE027"></div>
+<div class="input-group"><label>Password</label><input id="suPassword" type="password" placeholder="Create a password"></div>
+<div class="input-group"><label>Confirm Password</label><input id="suConfirmPassword" type="password" placeholder="Re-enter password"></div>
+<small class="field-note hidden full" id="suPasswordNote">Leave password fields blank to keep your current password.</small>
+<div class="input-group"><label>Department</label><input id="suDept" placeholder="CSE"></div>
+<div class="input-group"><label>Batch / Graduation Year</label><input id="suGradYear" type="number" placeholder="2027"></div>
+<div class="input-group"><label>CGPA</label><input id="suCgpa" type="number" step="0.01" placeholder="8.5"></div>
+<div class="input-group"><label>Active Backlogs</label><input id="suBacklogs" type="number" value="0"></div>
+<div class="input-group"><label>10th %</label><input id="suTenth" type="number" step="0.1" placeholder="85"></div>
+<div class="input-group"><label>12th %</label><input id="suTwelfth" type="number" step="0.1" placeholder="82"></div>
+<div class="input-group full"><label>Skills (comma separated)</label><input id="suSkills" placeholder="Java, Python, MySQL"></div>
+<div class="input-group"><label>Phone</label><input id="suPhone" placeholder="10-digit phone number"></div>
+<div class="input-group"><label>Profile Photo</label><input id="suPhoto" type="file" accept="image/*"><img id="suPhotoPreview" class="photo-preview"></div>
+<div class="input-group full"><label>Resume (PDF/DOC)</label><input id="suResumeFile" type="file" accept=".pdf,.doc,.docx"><small class="field-note" id="suResumeStatus">No resume selected yet.</small></div>
+</div>
+
+<div class="modal-buttons">
+<button class="btn secondary" onclick="closeAllModals()">Cancel</button>
+<button class="btn primary" id="suSubmitBtn" onclick="registerStudent()">Create Account</button>
+</div>
+</div>
+</div>
+
+<!-- ===================== PLACEMENT RECORD MODAL ===================== -->
+<div class="modal" id="placementModal">
+<div class="modal-box">
+<h2 class="modal-title">🏁 Record Placement</h2>
+<p class="modal-subtitle" id="placementModalSub">Record offer and joining details.</p>
+<div class="form-grid">
+<div class="input-group"><label>Package Offered</label><input id="plPackage" placeholder="₹7 LPA"></div>
+<div class="input-group"><label>Offer Date</label><input type="date" id="plOfferDate"></div>
+<div class="input-group"><label>Joining Date</label><input type="date" id="plJoiningDate"></div>
+<div class="input-group"><label>Joining Location</label><input id="plJoiningLocation" placeholder="Chennai"></div>
+</div>
+<div class="modal-buttons">
+<button class="btn secondary" onclick="closeAllModals()">Cancel</button>
+<button class="btn primary" onclick="confirmPlacement()">Save &amp; Mark Placed</button>
+</div>
+</div>
+</div>
+
+<!-- ===================== APPLICATION HISTORY MODAL ===================== -->
+<div class="modal" id="historyModal">
+<div class="modal-box">
+<h2 class="modal-title" id="historyTitle">Application Status History</h2>
+<div class="timeline" id="historyTimeline"></div>
+<div class="modal-buttons">
+<button class="btn secondary" onclick="closeAllModals()">Close</button>
+</div>
+</div>
+</div>
+
+<!-- CampusHire AI Placement Assistant: independent floating widget -->
+
+<!-- CampusHire AI Placement Assistant -->
+
+<!-- Add this widget ONLY to the Student and TPO dashboard pages.
+     Do not add it to the login page. -->
+
+<button id="ch-ai-launcher"
+        type="button"
+        aria-label="Open AI Placement Assistant"
+        aria-expanded="false"
+        aria-controls="ch-ai-panel"
+        title="AI Placement Assistant">✦</button>
+
+<section id="ch-ai-panel"
+         aria-label="AI Placement Assistant"
+         aria-hidden="true">
+
+  <header class="ch-ai-header">
+    <div class="ch-ai-avatar">✦</div>
+
+    <div class="ch-ai-heading">
+      <strong>AI Placement Assistant</strong>
+      <small>Career guidance · Interview prep</small>
+    </div>
+
+    <button id="ch-ai-close"
+            type="button"
+            aria-label="Close assistant">×</button>
+  </header>
+
+  <div id="ch-ai-messages" role="log" aria-live="polite">
+    <div class="ch-ai-message bot">
+      Hi! 👋 I'm your CampusHire Placement Assistant.
+      Ask me about resumes, aptitude, technical interviews,
+      HR rounds, or placement preparation.
+    </div>
+  </div>
+
+  <div class="ch-ai-quick" aria-label="Suggested questions">
+    <button type="button"
+            data-question="How should I prepare for a technical interview?">
+      Technical interview
+    </button>
+
+    <button type="button"
+            data-question="Give me a 7-day placement preparation plan.">
+      7-day study plan
+    </button>
+
+    <button type="button"
+            data-question="How can I improve my resume as a fresher?">
+      Resume tips
+    </button>
+  </div>
+
+  <form class="ch-ai-form" id="ch-ai-form">
+    <textarea id="ch-ai-input"
+              rows="1"
+              maxlength="2000"
+              placeholder="Ask a placement question..."
+              aria-label="Your question"
+              required></textarea>
+
+    <button id="ch-ai-send"
+            type="submit"
+            aria-label="Send message">➤</button>
+  </form>
+
+  <div class="ch-ai-disclaimer">
+    AI can make mistakes. Verify important placement details with your college.
+  </div>
+
+</section>
+
+<!-- Keep script.js only once per page.
+     Preserve this tag if it also handles dashboard functionality. -->
+<script src="script.js"></script>
+<script src="aptitude.js"></script>
+<script src="aptitude-study.js"></script>
+</body>
+</html>

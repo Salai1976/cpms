@@ -1,0 +1,35 @@
+/* Isolated CampusHire Aptitude module styles */
+.apt-chip{font-size:12px;color:#1d4ed8;background:#dbeafe;border-radius:20px;padding:6px 10px}
+.apt-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-bottom:18px}
+.apt-controls label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:bold}
+.apt-controls select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#172033}
+.apt-notice{margin-top:12px;color:#475569;font-size:13px}
+#aptitude [hidden]{display:none!important}
+.apt-quiz-head,.apt-actions{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.apt-progress-track{height:8px;background:#e2e8f0;border-radius:10px;overflow:hidden;margin:14px 0 24px}
+#aptProgressBar{height:100%;width:0;background:#2563eb;transition:width .2s}
+.apt-question{font-size:19px;font-weight:600;line-height:1.5;margin-bottom:20px}
+.apt-options{display:grid;gap:10px;margin-bottom:16px}
+.apt-option{display:flex;gap:10px;align-items:center;border:1px solid #cbd5e1;border-radius:9px;padding:13px;cursor:pointer;line-height:1.4}
+.apt-option:has(input:checked){border-color:#2563eb;background:#eff6ff;color:#172033}
+.apt-option input{accent-color:#2563eb}
+.apt-feedback{padding:14px;background:#eff6ff;border-radius:9px;margin:14px 0;line-height:1.5;color:#172033}
+.apt-actions{margin-top:16px}
+.apt-result-score{font-size:22px;font-weight:bold;margin:16px 0}
+.apt-review-item{border-top:1px solid #e2e8f0;padding:13px 0;line-height:1.5}
+body.dark #aptitude .apt-controls select{background:#334155;color:white;border-color:#475569}
+body.dark #aptitude .apt-option{border-color:#475569}
+body.dark #aptitude .apt-option:has(input:checked),body.dark #aptitude .apt-feedback{background:#334155;color:white}
+body.dark #aptitude .apt-notice{color:#cbd5e1}
+@media(max-width:600px){.apt-controls{grid-template-columns:1fr}.apt-question{font-size:16px}}
+
+/* Aptitude result breakdown and student-only browser history */
+.apt-result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.apt-metric{background:#f1f5f9;border-radius:10px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.apt-metric strong{font-size:21px;color:#1d4ed8}.apt-metric span{font-size:12px;color:#475569}
+.apt-result-message{background:#eff6ff;border-radius:10px;padding:14px;margin:12px 0;line-height:1.6}
+.apt-result-message p{margin-top:6px}.apt-history-section{margin-top:20px}
+.apt-table-wrap{overflow-x:auto}.apt-table-wrap table{min-width:580px}
+body.dark .apt-metric,body.dark .apt-result-message{background:#334155;color:#f1f5f9}
+body.dark .apt-metric strong,body.dark .apt-metric span{color:#e2e8f0}
+@media(max-width:600px){.apt-result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
